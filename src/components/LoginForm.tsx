@@ -72,8 +72,7 @@ export const LoginForm = ({
   const fetcher = useFetcher();
   const loginResponse = fetcher.data as ActionResponse<AuthResponse>;
 
-  const isSubmitting = fetcher.state === 'submitting';
-  const isLoading = fetcher.state === 'loading';
+  const isLoading = fetcher.state !== 'idle';
 
   // React hook form initial
   const form = useForm<z.infer<typeof formSchema>>({
@@ -95,57 +94,92 @@ export const LoginForm = ({
       {...props}
     >
       <Card className='overflow-hidden p-0'>
-        <CardContent className='grid p-0 md:grid-cols-2' />
-        <Form {...form}>
-          <form
-            className='p-6 md:p-8'
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
-            <div className='flex flex-col gap-6'>
-              <div className='flex flex-col items-center text-center'>
-                <h1 className='text-2xl font-semibold'>{LOGIN_FORM.title}</h1>
-                <p className='text-muted-foreground text-balance'>
-                  {LOGIN_FORM.description}
-                </p>
+        <CardContent className='grid p-0 md:grid-cols-2'>
+          <Form {...form}>
+            <form
+              className='p-6 md:p-8'
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <div className='flex flex-col gap-6'>
+                <div className='flex flex-col items-center text-center'>
+                  <h1 className='text-2xl font-semibold'>{LOGIN_FORM.title}</h1>
+                  <p className='text-muted-foreground text-balance'>
+                    {LOGIN_FORM.description}
+                  </p>
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name='email'
+                  render={({ field }) => (
+                    <FormItem className='grid gap-3'>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder='johndoe@example.com'
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='password'
+                  render={({ field }) => (
+                    <FormItem className='grid gap-3'>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <InputPassword
+                          placeholder='Enter your password'
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type='submit'
+                  className='w-full'
+                  disabled={isLoading}
+                >
+                  {isLoading && <LoaderCircleIcon className='animate-spin' />}
+                  <span>Login</span>
+                </Button>
               </div>
 
-              <FormField
-                control={form.control}
-                name='email'
-                render={({ field }) => (
-                  <FormItem className='grid gap-3'>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='johndoe@example.com'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='password'
-                render={({ field }) => (
-                  <FormItem className='grid gap-3'>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <InputPassword
-                        placeholder='Enter your password'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </form>
-        </Form>
+              <div className='mt-4 text-center text-sm'>
+                {LOGIN_FORM.footerText}{' '}
+                <Link
+                  to='/signup'
+                  className='underline underline-offset-4 hover:text-primary'
+                  viewTransition
+                >
+                  Sign up
+                </Link>
+              </div>
+            </form>
+          </Form>
+          <figure className='bg-muted relative hidden md:block'>
+            <img
+              src={loginBanner}
+              width={400}
+              height={400}
+              alt='Login banner'
+              className='absolute inset-0 w-full h-full object-cover'
+            />
+          </figure>
+        </CardContent>
       </Card>
+
+      <div className='text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4'>
+        By clicking continue, you agree to our <a href='#'>Terms of Service</a>{' '}
+        and <a href='#'>Privacy Policy</a>.
+      </div>
     </div>
   );
 };

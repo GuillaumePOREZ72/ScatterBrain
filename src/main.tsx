@@ -18,10 +18,12 @@ import router from '@/routes';
 /**
  * Components
  */
-
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <ThemeProvider>
+      <RouterProvider router={router} />
+    </ThemeProvider>
   </StrictMode>,
 );
