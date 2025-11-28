@@ -5,7 +5,8 @@ import { Outlet } from 'react-router';
 
 /**
  * Components
- */
+*/
+import { Loading } from '@/components/Loading';
 
 export const RootLayout = () => {
   return (
