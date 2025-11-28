@@ -1,7 +1,7 @@
 /**
  * Node modules
  */
-import { data, redirect } from 'react-router';
+import {redirect } from 'react-router';
 
 /**
  * Custom router
@@ -19,29 +19,31 @@ const refreshTokenLoader: LoaderFunction = async ({ request }) => {
   const redirectUri = url.searchParams.get('redirect') ?? '/';
 
   try {
-    const { data } = await scatterbrainApi.post(
+    const response = await scatterbrainApi.post(
       '/auth/refresh-token',
       {},
       { withCredentials: true },
     );
 
-    localStorage.setItem('accessToken', data.accessToken);
+    localStorage.setItem('accessToken', response.data.accessToken);
 
     return redirect(redirectUri);
   } catch (error) {
     if (error instanceof AxiosError) {
-      const tokenExpired =
-        error.response?.data.message.includes('token expired');
+      // Vérifie aussi le status 401/403
+      const isUnauthorized =
+        error.response?.status === 401 || error.response?.status === 403;
 
-      if (tokenExpired) {
+      if (isUnauthorized) {
         localStorage.removeItem('user');
         localStorage.removeItem('accessToken');
         return redirect('/login');
       }
 
-      throw data(error.response?.data.message || error.message, {
-        status: error.response?.status || error.status,
-        statusText: error.response?.data.code || error.code,
+      // Pour les autres erreurs, utilise Response directement
+      throw new Response(error.response?.data.message || error.message, {
+        status: error.response?.status || 500,
+        statusText: error.response?.data.code || 'Error',
       });
     }
     throw error;
