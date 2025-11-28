@@ -6,6 +6,7 @@ import { createBrowserRouter } from 'react-router';
 /**
  * Loaders
  */
+import refreshTokenLoader from '@/routes/loaders/refreshToken';
 
 /**
  * Pages
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/refresh-token',
+    loader:refreshTokenLoader,
   },
   {
     path: '/',
