@@ -44,8 +44,10 @@ import type {
   ActionResponse,
   AuthResponse,
   ErrorResponse,
+  FieldValidationError,
   ValidationError,
 } from '@/types';
+
 type SignupField = 'email' | 'password' | 'role';
 
 /**
@@ -93,10 +95,56 @@ export const SignupForm = ({
     },
   });
 
+  // Handle server error response
+  useEffect(() => {
+    if (!signupResponse) return;
+
+    if (signupResponse.ok) {
+      navigate('/', { viewTransition: true });
+      return;
+    }
+
+    if (!signupResponse.err) return;
+
+    if (signupResponse.err.code === 'AuthorizationError') {
+      const authorizationError = signupResponse.err as ErrorResponse;
+
+      toast.error(authorizationError.message, {
+        position: 'top-center',
+      });
+    }
+
+    if (signupResponse.err.code === 'ValidationError') {
+      const validationErrors = signupResponse.err as ValidationError;
+
+      Object.entries(validationErrors.errors).forEach(
+        ([, fieldError]: [string, FieldValidationError]) => {
+          const signupField = fieldError.path as SignupField;
+
+          form.setError(
+            signupField,
+            {
+              type: 'custom',
+              message: fieldError.msg,
+            },
+            { shouldFocus: true },
+          );
+        },
+      );
+    }
+  }, [signupResponse, navigate, form]);
+
   // Handle form submission
-  const onSubmit = useCallback(async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-  }, []);
+  const onSubmit = useCallback(
+    async (values: z.infer<typeof formSchema>) => {
+      await fetcher.submit(values, {
+        action: '/signup',
+        method: 'post',
+        encType: 'application/json',
+      });
+    },
+    [fetcher],
+  );
 
   return (
     <div
@@ -112,7 +160,9 @@ export const SignupForm = ({
             >
               <div className='flex flex-col gap-6'>
                 <div className='flex flex-col items-center text-center'>
-                  <h1 className='text-2xl font-semibold'>{SIGNUP_FORM.title}</h1>
+                  <h1 className='text-2xl font-semibold'>
+                    {SIGNUP_FORM.title}
+                  </h1>
                   <p className='text-muted-foreground px-6'>
                     {SIGNUP_FORM.description}
                   </p>

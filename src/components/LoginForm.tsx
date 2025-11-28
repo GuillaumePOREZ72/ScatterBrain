@@ -83,10 +83,44 @@ export const LoginForm = ({
     },
   });
 
+  // Handle server error response
+  useEffect(() => {
+    if (!loginResponse) return;
+
+    if (loginResponse.ok) {
+      navigate('/', { viewTransition: true });
+      return;
+    }
+
+    if (!loginResponse.err) return;
+
+    if (loginResponse.err.code === 'ValidationError') {
+      const validationErrors = loginResponse.err as ValidationError;
+
+      Object.entries(validationErrors.errors).forEach((value) => {
+        const [, validationError] = value;
+        const loginField = validationError.path as LoginFieldName;
+
+        form.setError(
+          loginField,
+          {
+            type: 'custom',
+            message: validationError.msg,
+          },
+          { shouldFocus: true },
+        );
+      });
+    }
+  }, [loginResponse, navigate, form]);
+
   // Handle form submission
   const onSubmit = useCallback(async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-  }, []);
+    await fetcher.submit(values, {
+      action: '/login',
+      method: 'post',
+      encType: 'application/json',
+    });
+  }, [fetcher]);
 
   return (
     <div
