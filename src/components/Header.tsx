@@ -16,10 +16,13 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Logo } from '@/components/Logo';
 import { Navbar } from '@/components/Navbar';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { UserMenu } from '@/components/UserMenu';
 
 /**
  * Custom hooks
  */
+import { useUser } from '@/hooks/useUser';
 
 /**
  * Assets
@@ -30,7 +33,8 @@ export const Header = ({
   className,
   ...props
 }: React.ComponentProps<'header'>) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const user = useUser();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(true);
   return (
     <header
       className={cn(
@@ -48,7 +52,39 @@ export const Header = ({
             !mobileMenuOpen && 'max-md:hidden',
           )}
         >
-          <Navbar />
+          <Navbar className='max-md:p-3 md:ms-4' />
+          {!user && (
+            <>
+              <Separator className='md:hidden' />
+
+              <div className='flex flex-col-reverse gap-y-3 gap-x-2 md:flex-row md:items-center max-md:p-3'>
+                <Button
+                  variant='outline'
+                  asChild
+                >
+                  <Link
+                    to='/login'
+                    viewTransition
+                  >
+                    Login
+                  </Link>
+                </Button>
+
+                <Button asChild>
+                  <Link
+                    to='/signup'
+                    viewTransition
+                  >
+                    Get Started
+                  </Link>
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+        <div className='flex items-center gap-1 ms-auto'>
+          <ThemeToggle />
+          <UserMenu />
         </div>
       </div>
     </header>
