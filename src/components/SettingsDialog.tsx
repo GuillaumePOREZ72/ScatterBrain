@@ -55,4 +55,14 @@ import type { DialogProps } from '@radix-ui/react-dialog';
 /**
  * Profile form schema
  */
-const profileFormSchema = 
+const profileFormSchema = z.object({
+  firstName: z.string().max(20, 'First name must be less than 20 characters'),
+  lastName: z.string().max(20, 'Last name must be less than 20 characters'),
+  email: z
+    .string()
+    .max(50, 'Email must be less than 50 characters')
+    .email('Invalid email address'),
+  username: z.string().max(20, 'Username must be less than 20 characters'),
+});
+
+
