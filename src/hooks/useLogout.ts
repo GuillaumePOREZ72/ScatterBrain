@@ -13,19 +13,22 @@ export const useLogout = () => {
   const location = useLocation();
 
   return async () => {
-    const accessToken = localStorage.getItem('accessToken');
-    const response = await scatterbrainApi.post(
-      '/auth/logout',
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      await scatterbrainApi.post(
+        '/auth/logout',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
         },
-        withCredentials: true,
-      },
-    );
-
-    if (response.status >= 400) return;
+      );
+    } catch (error) {
+      // Ignorer l'erreur - on veut déconnecter même si le serveur échoue
+      console.warn('Logout request failed:', error);
+    }
 
     localStorage.removeItem('accessToken');
     localStorage.removeItem('user');

@@ -79,10 +79,12 @@ export const UserMenu = () => {
                 </Link>
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem>
-              <SettingsIcon />
-              Settings
-            </DropdownMenuItem>
+            <SettingsDialog>
+              <DropdownMenuItem>
+                <SettingsIcon />
+                Settings
+              </DropdownMenuItem>
+            </SettingsDialog>
             <DropdownMenuItem onClick={logout}>
               <LogOutIcon />
               Log out
